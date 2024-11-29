@@ -1,5 +1,6 @@
 import { Telegraf } from 'telegraf';
 import dotenv from 'dotenv';
+import { message } from 'telegraf/filters';
 
 dotenv.config();
 
@@ -18,8 +19,8 @@ bot.start((ctx) => {
   ctx.reply('Привет! Я ваш Telegram-бот. Чем могу помочь?');
 });
 
-// Пример обработки сообщений
-bot.on('text', (ctx) => {
+bot.on(message('text'), (ctx) => {
+  console.log(ctx.message);
   ctx.reply(`Вы написали: ${ctx.message.text}`);
 });
 
