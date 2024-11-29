@@ -1,0 +1,28 @@
+{
+  "name": "psy_entry_bot",
+  "module": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run src/main.ts --watch",
+    "build": "bun build ./src/main.ts --outdir ./dist --target node",
+    "start": "node dist/main.js",
+    "db:start": "docker-compose -f ./docker/postgres/docker-compose.yml up -d"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "ts-node-dev": "^2.0.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.0.0",
+    "abort-controller": "^3.0.0",
+    "body-parser": "^1.20.3",
+    "dotenv": "^16.4.5",
+    "prisma": "^6.0.0",
+    "telegraf": "^4.16.3"
+  }
+}
