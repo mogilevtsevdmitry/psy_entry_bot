@@ -13,7 +13,9 @@
     "baseUrl": "./",
     "paths": {
       "@telegram/*": ["./src/telegram/*"],
-      "@core/*": ["./src/core/*"]
+      "@core/*": ["./src/core/*"],
+      "@redis/*": ["./src/redis/*"],
+      "@redis": ["./src/redis"]
     }
   },
   "include": ["src"],

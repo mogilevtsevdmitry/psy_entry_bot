@@ -1,21 +1,39 @@
-export const commands = [
+export enum ICommandName {
+  start = 'start',
+  active_request = 'active_request',
+  request_in_work = 'request_in_work',
+  deleted_request = 'deleted_request',
+  help = 'help',
+}
+
+export interface ICommand {
+  name: ICommandName;
+  description: string;
+  isAdmin: boolean;
+}
+export const commands: ICommand[] = [
   {
-    name: 'start',
+    name: ICommandName.start,
     description: 'Запуск приложения',
     isAdmin: false,
   },
   {
-    name: 'active_request',
+    name: ICommandName.help,
+    description: 'Помощь',
+    isAdmin: false,
+  },
+  {
+    name: ICommandName.active_request,
     description: 'Список активных заявок',
     isAdmin: true,
   },
   {
-    name: 'request_in_work',
+    name: ICommandName.request_in_work,
     description: 'Запросы в работе',
     isAdmin: true,
   },
   {
-    name: 'deleted_request',
+    name: ICommandName.deleted_request,
     description: 'Удаленные запросы',
     isAdmin: true,
   },

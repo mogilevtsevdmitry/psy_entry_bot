@@ -1,11 +1,12 @@
-import { TelegrafContext } from '@telegram/interfaces';
+import { ConfigService } from '@core/config.service';
 import dotenv from 'dotenv';
-import { Context, Telegraf } from 'telegraf';
+import { Context, Scenes, session, Telegraf } from 'telegraf';
 import { Update } from 'telegraf/typings/core/types/typegram';
 import { CommandService } from './commands';
+import { handleCallbackQuery } from './commands/callback-handlers/handle-callback.query';
+import { start } from './commands/use-cases/start';
+import { SCENES } from './scenes';
 import { isAdmin } from './utils';
-import { ConfigService } from '@core/config.service';
-import { start } from './commands/start';
 
 dotenv.config();
 
@@ -13,6 +14,7 @@ export class Bot extends CommandService {
   private bot: Telegraf<Context<Update>>;
   private commandService: CommandService;
   private configService: ConfigService;
+  private stage: Scenes.Stage<TelegrafContext>;
 
   constructor() {
     super();
@@ -20,6 +22,9 @@ export class Bot extends CommandService {
     this.configService = new ConfigService();
     this.bot = new Telegraf(this.configService.telegramToken);
     this.commandService = new CommandService();
+    this.stage = new Scenes.Stage(SCENES);
+    this.bot.use(session());
+    this.bot.use(this.stage.middleware());
     // Очистка всех команд при старте
     this.bot.telegram.setMyCommands([]);
     this.start();
@@ -33,10 +38,11 @@ export class Bot extends CommandService {
     this.bot.stop(reason);
   }
 
-  private start() {
+  private async start() {
     return this.bot.start(async (ctx: TelegrafContext) => {
       await this.registerCommands(ctx);
-      void start(ctx);
+      this.bot.on('callback_query', handleCallbackQuery);
+      await start(ctx);
     });
   }
 
@@ -44,13 +50,9 @@ export class Bot extends CommandService {
    * Регистрация команд
    */
   private async registerCommands(ctx: TelegrafContext) {
-    console.log({ publicCommands: this.commandService.publicCommands });
-
     // Если пользователь — администратор, добавляем все команды
     const adminId = this.configService.adminId;
-    console.log({ isAdmin: isAdmin(ctx) });
     if (isAdmin(ctx)) {
-      console.log({ allCommands: this.commandService.allCommands });
       await this.bot.telegram.setMyCommands(this.commandService.allCommands, {
         scope: { type: 'chat', chat_id: adminId },
       });
@@ -67,7 +69,6 @@ export class Bot extends CommandService {
   }
 
   private async setCommand(method: string) {
-    console.log('Register command: ', method);
     this.bot.command(method, async (ctx: TelegrafContext) => {
       await (this[method as keyof Bot] as Function)(ctx);
     });

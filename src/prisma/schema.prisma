@@ -8,15 +8,15 @@ datasource db {
 }
 
 model User {
-  id           BigInt  @id @default(autoincrement())
-  telegramId   BigInt  @unique @map("telegram_id")
-  phone        BigInt?
-  isBot        Boolean @map("is_bot")
-  firstName    String? @map("first_name")
-  lastName     String? @map("last_name")
-  username     String?
-  languageCode String? @map("language_code")
-  isPremium    Boolean @map("is_premium")
+  id               BigInt  @id @default(autoincrement())
+  telegramId       BigInt  @unique @map("telegram_id")
+  phone            BigInt?
+  isBot            Boolean @map("is_bot")
+  firstName        String? @map("first_name")
+  lastName         String? @map("last_name")
+  username         String?
+  languageCode     String? @map("language_code")
+  isPremium        Boolean @map("is_premium")
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
@@ -41,10 +41,18 @@ model Message {
   @@map("messages")
 }
 
+enum RequestStatus {
+  ACTIVE   @map("active")
+  IN_WORK  @map("in_work")
+  DECLINE  @map("decline")
+  COMPLETE @map("complete")
+}
+
 model Request {
-  id      BigInt @id @default(autoincrement())
+  id      BigInt        @id @default(autoincrement())
   name    String?
-  request String? @db.Text
+  request String?       @db.Text
+  status  RequestStatus
 
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")

@@ -6,7 +6,10 @@
     "dev": "bun run src/main.ts --watch",
     "build": "bun build ./src/main.ts --outdir ./dist --target node",
     "start": "node dist/main.js",
-    "db:start": "docker-compose -f ./docker/postgres/docker-compose.yml up -d"
+    "docker:start": "docker-compose -f ./docker/postgres/docker-compose.yml up -d",
+    "prisma:generate": "npx prisma generate --schema ./src/prisma/schema.prisma",
+    "prisma:push": "npx prisma db push --schema ./src/prisma/schema.prisma",
+    "prisma:migrate": "npx prisma migrate dev --schema ./src/prisma/schema.prisma"
   },
   "devDependencies": {
     "@types/bun": "latest",
@@ -21,7 +24,9 @@
     "@prisma/client": "^6.0.0",
     "abort-controller": "^3.0.0",
     "body-parser": "^1.20.3",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
+    "ioredis": "^5.4.1",
     "prisma": "^6.0.0",
     "reflect-metadata": "^0.2.2",
     "telegraf": "^4.16.3"

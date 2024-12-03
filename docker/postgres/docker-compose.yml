@@ -17,9 +17,18 @@ services:
       - postgres
     restart: unless-stopped
 
+  redis:
+    image: redis:latest
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redis-data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD:-password}
+
 networks:
   postgres:
     driver: bridge
 
 volumes:
   postgres:
+  redis-data:
