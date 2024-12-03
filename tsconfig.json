@@ -7,8 +7,15 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "baseUrl": "./",
+    "paths": {
+      "@telegram/*": ["./src/telegram/*"],
+      "@core/*": ["./src/core/*"]
+    }
   },
-  "include": ["src", "node_modules/abort-controller"],
+  "include": ["src"],
   "exclude": ["node_modules", "dist"]
 }

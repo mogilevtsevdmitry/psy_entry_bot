@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Bot } from './telegram/bot';
 
 const bootstrap = async () => {
@@ -6,11 +7,9 @@ const bootstrap = async () => {
 
   // Добавьте отладочные сообщения
   console.log('Initializing bot...');
-  await bot
-    .launch()
-    .catch((err) => {
-      console.error('Error during bot launch:', err);
-    });
+  await bot.launch().catch((err) => {
+    console.error('Error during bot launch:', err);
+  });
 
   // Обработка завершения работы
   process.once('SIGINT', () => bot.stop('SIGINT'));
