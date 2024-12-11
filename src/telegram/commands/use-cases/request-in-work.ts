@@ -1,6 +1,6 @@
 import { PrismaClient, RequestStatus } from '@prisma/client';
-import { format } from 'date-fns';
 import { Pagination } from '../command-service';
+import { format } from 'date-fns';
 
 export const activeRequest = async (
   ctx: TelegrafContext,
@@ -10,17 +10,17 @@ export const activeRequest = async (
   const PAGE_SIZE = 5;
   const [requests, count] = await Promise.all([
     prisma.request.findMany({
-      where: { deletedAt: null, status: RequestStatus.ACTIVE },
+      where: { deletedAt: null, status: RequestStatus.IN_WORK },
       take: pagination.limit,
       skip: pagination.offset,
     }),
     prisma.request.count({
-      where: { deletedAt: null, status: RequestStatus.ACTIVE },
+      where: { deletedAt: null, status: RequestStatus.IN_WORK },
     }),
   ]);
 
   if (!count) {
-    return ctx.reply('Нет активных запросов');
+    return ctx.reply('Нет запросов в работе');
   }
 
   const buttons = requests.map((request) => [
@@ -52,7 +52,7 @@ export const activeRequest = async (
     buttons.push(navigationButtons);
   }
 
-  await ctx.reply('*АКТИВНЫЕ ЗАЯВКИ*', {
+  await ctx.reply('*ЗАЯВКИ В РАБОТЕ*', {
     parse_mode: 'Markdown',
     reply_markup: {
       inline_keyboard: buttons,

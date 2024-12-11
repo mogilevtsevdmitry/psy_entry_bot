@@ -97,7 +97,7 @@ registerRequestScene.on(message('text'), async (ctx) => {
       case StepEnum.PHONE:
         const phonePattern = /^7\s?\d{3}\s?\d{3}\s?\d{2}\s?\d{2}$/;
         if (phonePattern.test(userMessage.replace(/\s+/g, ''))) {
-          state[StepEnum.PHONE] = BigInt(Number(formatPhone(userMessage)));
+          state[StepEnum.PHONE] = Number(formatPhone(userMessage));
           state.step = StepEnum.REQUEST;
           await setUserState(userId, state);
           await ctx.reply(steps[StepEnum.REQUEST].question);

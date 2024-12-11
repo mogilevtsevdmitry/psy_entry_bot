@@ -1,4 +1,5 @@
-import { PrismaClient, Request, User } from '@prisma/client';
+import { PrismaClient, Request, RequestStatus, User } from '@prisma/client';
+import { ChangeStatusEnum } from '@telegram/commands/use-cases/change-status';
 import { format } from 'date-fns';
 import { Scenes } from 'telegraf';
 
@@ -8,12 +9,67 @@ const viewRequestScene = new Scenes.BaseScene<TelegrafContext>(
 );
 
 const formatRequest = (data: Request & { user: User }) => `
-*Заявка:* ${data.id}\n
+*Заявка:* №${data.id}\n
 *Имя:* ${data.user.lastName} ${data.user.firstName}\n
 *Телефон*: ${data.user.phone}\n
 *Дата запроса*: ${format(data.createdAt, 'dd.MM.yyyy')}\n
 *Запрос:* ${data.request}
 `;
+
+const actionBtnByStatus = (id: number, status: RequestStatus) => {
+  switch (status) {
+    case 'ACTIVE':
+      return [
+        [
+          {
+            text: 'В работу 📝',
+            callback_data: `change_request_${ChangeStatusEnum.IN_WORK}_${id}`,
+          },
+        ],
+        [
+          {
+            text: 'Отклонить ❌',
+            callback_data: `change_request_${ChangeStatusEnum.DECLINE}_${id}`,
+          },
+        ],
+      ];
+    case 'COMPLETE':
+      return [
+        [
+          {
+            text: 'Удалить 🗑️',
+            callback_data: `change_request_${ChangeStatusEnum.DELETE}_${id}`,
+          },
+        ],
+      ];
+    case 'DECLINE':
+      return [
+        [
+          {
+            text: 'Удалить 🗑️',
+            callback_data: `change_request_${ChangeStatusEnum.DELETE}_${id}`,
+          },
+        ],
+      ];
+    case 'IN_WORK':
+      return [
+        [
+          {
+            text: 'Выполнено ✅',
+            callback_data: `change_request_${ChangeStatusEnum.COMPLETE}_${id}`,
+          },
+        ],
+        [
+          {
+            text: 'Отклонить ❌',
+            callback_data: `change_request_${ChangeStatusEnum.DECLINE}_${id}`,
+          },
+        ],
+      ];
+    default:
+      return [];
+  }
+};
 
 viewRequestScene.enter(async (ctx) => {
   const prisma = new PrismaClient();
@@ -33,14 +89,7 @@ viewRequestScene.enter(async (ctx) => {
     await ctx.reply(formatRequest(requestData), {
       parse_mode: 'Markdown',
       reply_markup: {
-        inline_keyboard: [
-          [
-            {
-              text: 'Перейти в чат',
-              url: `https://t.me/${requestData.user.username}`,
-            },
-          ],
-        ],
+        inline_keyboard: actionBtnByStatus(requestId, requestData.status),
       },
     });
   } else {
