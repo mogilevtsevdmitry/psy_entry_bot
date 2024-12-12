@@ -2,7 +2,7 @@ import { PrismaClient, RequestStatus } from '@prisma/client';
 import { format } from 'date-fns';
 import { Pagination } from '../command-service';
 
-export const inWorkRequests = async (
+export const declineRequests = async (
   ctx: TelegrafContext,
   prisma: PrismaClient,
   pagination: Pagination
@@ -10,17 +10,17 @@ export const inWorkRequests = async (
   const PAGE_SIZE = 5;
   const [requests, count] = await Promise.all([
     prisma.request.findMany({
-      where: { deletedAt: null, status: RequestStatus.IN_WORK },
+      where: { deletedAt: null, status: RequestStatus.DECLINE },
       take: pagination.limit,
       skip: pagination.offset,
     }),
     prisma.request.count({
-      where: { deletedAt: null, status: RequestStatus.IN_WORK },
+      where: { deletedAt: null, status: RequestStatus.DECLINE },
     }),
   ]);
 
   if (!count) {
-    return ctx.reply('Нет запросов в работе');
+    return ctx.reply('Нет отклоненных запросов');
   }
 
   const buttons = requests.map((request) => [
@@ -38,13 +38,13 @@ export const inWorkRequests = async (
   if (pagination.offset > 0) {
     navigationButtons.push({
       text: '⬅️ Назад',
-      callback_data: `request_in_work_${pagination.offset - 1}`,
+      callback_data: `decline_request_${pagination.offset - 1}`,
     });
   }
   if (pagination.offset < totalPages) {
     navigationButtons.push({
       text: 'Вперед ➡️',
-      callback_data: `request_in_work_${pagination.offset + 1}`,
+      callback_data: `decline_request_${pagination.offset + 1}`,
     });
   }
 
@@ -52,7 +52,7 @@ export const inWorkRequests = async (
     buttons.push(navigationButtons);
   }
 
-  await ctx.reply('*ЗАЯВКИ В РАБОТЕ*', {
+  await ctx.reply('*ОТКЛОНЕННЫЕ ЗАЯВКИ*', {
     parse_mode: 'Markdown',
     reply_markup: {
       inline_keyboard: buttons,

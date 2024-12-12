@@ -77,7 +77,7 @@ viewRequestScene.enter(async (ctx) => {
 
   const requestData = await prisma.request
     .findUnique({
-      where: { id: requestId, deletedAt: null },
+      where: { id: requestId },
       include: { user: true },
     })
     .catch((err) => {
@@ -86,11 +86,12 @@ viewRequestScene.enter(async (ctx) => {
     });
 
   if (requestData) {
+    const inline_keyboard = requestData.deletedAt
+      ? []
+      : actionBtnByStatus(requestId, requestData.status);
     await ctx.reply(formatRequest(requestData), {
       parse_mode: 'Markdown',
-      reply_markup: {
-        inline_keyboard: actionBtnByStatus(requestId, requestData.status),
-      },
+      reply_markup: { inline_keyboard },
     });
   } else {
     await ctx.reply('Заявка не найдена.');
